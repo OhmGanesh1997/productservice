@@ -1,0 +1,46 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/security
+	http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+
+	<!-- <http pattern="/rest/productservice/**" security="none" /> -->
+
+	<security:http pattern="/rest/**"
+		authentication-manager-ref="authenticationManager" create-session="never" use-expressions="true"
+		entry-point-ref="basicEntryPoint">
+		
+		<intercept-url pattern="/rest/**" access="hasAnyRole('ROLE_AGRIPRENEUR', 'ROLE_COORDINATOR', 'ROLE_ADMIN')" />
+		
+		<security:custom-filter ref="customBasicAuthFilter"
+			position="BASIC_AUTH_FILTER" />
+	</security:http>
+	
+	<beans:bean id="customBasicAuthFilter" class="com.plantation.init.CustomBasicAuthFilter" />
+
+	<beans:bean id="basicEntryPoint"
+		class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
+		<beans:property name="realmName" value="REST Webservices" />
+	</beans:bean>
+
+
+	<!-- <beans:bean id="cusAuthFilter" class="com.plantation.security.CustomUsernamePasswordAuthenticationFilter">
+		<beans:property name="authenticationManager" ref="authenticationManager" />
+		<beans:property name="authenticationSuccessHandler" ref="mySuccessHandler" />
+		<beans:property name="authenticationFailureHandler" ref="customAuthenticationFailureHandler" />
+	</beans:bean>
+
+	<beans:bean id="mySuccessHandler" class="com.plantation.security.CustomSimpleURLAuthenticationSuccessHandler" />
+
+	<beans:bean id="customAuthenticationFailureHandler" class="com.plantation.security.CustomAuthenticationFailureHandler" /> -->
+
+	<beans:bean id="userDetailsService" class="com.plantation.security.UserDetailsServiceImpl" />
+
+	<authentication-manager alias="authenticationManager">
+		<authentication-provider user-service-ref="userDetailsService" />
+	</authentication-manager>
+
+
+</beans:beans>
